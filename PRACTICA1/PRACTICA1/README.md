@@ -194,8 +194,11 @@
 
   // Para ejecutar el proyecto:
 
-  // 1. npm install
-  // 2. npm run dev
+  // 1. git clone https://github.com/AlejandroCarazo26/TODOPRACTICASFRONT.git
+  // 2. cd PRACTICA1
+  // 3. cd PRACTICA1 (de nuevo)
+  // 4. npm install
+  // 5. npm run dev
 
   // Esto abrirá el servidor local.
   // En consola se puede pulsar "o" para abrir en el navegador.
