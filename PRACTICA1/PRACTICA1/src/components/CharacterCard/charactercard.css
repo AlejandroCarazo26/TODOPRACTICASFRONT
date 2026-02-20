@@ -1,0 +1,16 @@
+.card {
+  margin-bottom: 120px; /*Añade un margen de espacio entre cada personaje*/
+}
+
+.name {
+  font-size: 70px; /*hace el nombre grande*/
+  text-transform: uppercase; /*convertimos el texto a mayúsculas*/
+  margin-bottom: 30px; /*añade espacio entre el nombre del personaje y sus datos*/
+}
+
+p { /*no hay punto porque no es una clase como las anteriores, 
+  sinom que afecta a todas las etiquetas p del programa*/
+  
+  font-size: 40px; /*hace los textos secundarios grandes pero más pequeños que el nombre*/
+  margin: 15px 0; /*da margen entre los textos secundarios*/
+}

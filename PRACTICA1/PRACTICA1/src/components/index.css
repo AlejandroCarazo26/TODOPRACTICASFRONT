@@ -1,0 +1,16 @@
+
+/*elemento raíz del documento, elemento de contenido principal visible y elemento donde React monta la web*/
+html, body, #root { 
+  height: 100%; /*los elementos ocupan el 100% de la pantalla*/
+  margin: 0;
+  padding: 0; /*quitamos el borde blanco  de márgenes y hacemos que el fondo negro cubra toda la pantalla*/
+  background: black;
+}
+
+body {
+  color: #ffe81f; /*Color parecido al de la fuente de Star Wars*/
+  font-family: 'Arial Black', Arial, sans-serif; /*fuente del documento*/
+  overflow-x: hidden; /*bloqueo del scroll horizontal*/
+  overflow-y: auto; /*permite el scroll vertical si el contenido es más grande que la pantalla*/
+}
+

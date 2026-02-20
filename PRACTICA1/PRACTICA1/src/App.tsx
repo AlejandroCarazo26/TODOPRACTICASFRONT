@@ -1,35 +1,75 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
+import { CharacterList } from "./components/CharacterList/characterlist";
+import { Loader } from "./components/loader/loader";
+import { Error } from "./components/error/error";
+import { api } from "./api/api";
+import type { Character } from "./types/character";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [nextPage, setNextPage] = useState<string | null>(null);
+
+  useEffect(() => {
+  api.get("https://swapi.dev/api/people/")
+    .then((e) => {
+      setCharacters(e.data.results);
+      setNextPage(e.data.next);
+    })
+    .catch((e) => {
+      setError(`Error cargando los datos: ${e.message}`);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  }, []);
+
+
+  const loadMore = () => {
+    if (!nextPage) return;
+
+    setLoading(true);
+
+    api.get(nextPage)
+      .then((e) => {
+        setCharacters(prev => [...prev, ...e.data.results]);
+        setNextPage(e.data.next);
+      })
+      .catch((e) => {
+        setError(`Error cargando más personajes: ${e.message}`);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+
+
+
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="mainContainer">
 
-export default App
+      {loading && <Loader/>}
+
+      {error && <Error error={error}/>}
+
+      
+      {nextPage && (
+        <button className="loadMoreButton" onClick={loadMore}>
+          Siguiente Página
+        </button>
+      )}
+
+      <CharacterList personajes={characters} />
+
+
+    </div>
+
+  );
+};
+
+export default App;
