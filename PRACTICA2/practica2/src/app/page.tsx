@@ -1,66 +1,81 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+
+import { useEffect, useState } from "react";
+import { Country } from "./types/pais";
+import { getAllCountries } from "./api/todospaises";
+import "./page.css";
+import CountryByName from "./components/country";
+
+
+const Home = () => {
+
+  const [inputText, setInputText] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() =>{
+
+    setLoading(true);
+    setError(null);
+
+    getAllCountries()
+      .then((res) => {
+        setCountries(res.data);
+     })
+     .catch((e) => {
+        setError(`Error cargando los datos: ${e.message}`);
+     })
+     .finally(() => {
+        setLoading(false);
+     })
+
+  }, []);
+
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="cocktails-container">
+      <div className="search-section"> 
+        <h1> Bienvenido al buscador de Paises </h1>
+
+        <input className="searchinput"
+        type="text"
+        value={inputText}
+        onChange={(e) => setInputText(e.target.value)}
+        onKeyDown={(e)=>{
+          if(e.key=== "Enter"){
+            setSearch(inputText);
+          }
+        }}> 
+        </input>
+
+
+        <button 
+          className="searchButton"
+          onClick={() => setSearch(inputText)}
+        > Search </button>
+      </div>
+
+        {loading && <h1> Loading... </h1>}
+        {error && <h2> {error} </h2>}
+
+        <div className="results-container">
+          {search && countries
+            .filter((x) =>
+              x.name.common.toLowerCase().includes(search.toLowerCase())
+            )
+            .slice(0, 20)
+            .map((e) => (
+              <CountryByName country={e} key={e.name.common}/>
+            ))}
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+
     </div>
+
   );
-}
+
+};
+
+export default Home;
