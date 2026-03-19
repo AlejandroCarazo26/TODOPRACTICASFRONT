@@ -1,12 +1,11 @@
 "use client";
 
-
+import { getProductById } from "@/app/api/product";
 import { Product } from "@/app/types";
 import SectionContainer from "@/app/components/sectionContainer";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import "./productDetail.css";
-import { getProductById } from "@/app/api/product";
 
 const ProductDetail = () => {
   const router = useRouter();
@@ -15,11 +14,13 @@ const ProductDetail = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [currentImage, setCurrentImage] = useState<number>(0);
 
   useEffect(() => {
     getProductById(String(id))
       .then((res) => {
         setProduct(res.data);
+        setCurrentImage(0);
         setError("");
       })
       .catch((e) => {
@@ -30,6 +31,20 @@ const ProductDetail = () => {
       });
   }, [id]);
 
+  const handlePrev = () => {
+    if (!product) return;
+    setCurrentImage((prev) =>
+      prev === 0 ? product.images.length - 1 : prev - 1
+    );
+  };
+
+  const handleNext = () => {
+    if (!product) return;
+    setCurrentImage((prev) =>
+      prev === product.images.length - 1 ? 0 : prev + 1
+    );
+  };
+
   return (
     <div className="product-detail-container">
       {loading && <h1>Loading...</h1>}
@@ -38,10 +53,20 @@ const ProductDetail = () => {
       {product && (
         <SectionContainer className="product-detail-card">
 
+          {/* Galería con navegación — mismo sitio que antes tenía la imagen única */}
           <div className="product-gallery">
-            {product.images.map((img, i) => (
-              <img key={i} src={img} alt={`${product.title} ${i + 1}`} className="gallery-img" />
-            ))}
+            <button className="gallery-btn" onClick={handlePrev}>&#8592;</button>
+            <div className="gallery-img-wrapper">
+              <img
+                src={product.images[currentImage]}
+                alt={`${product.title} ${currentImage + 1}`}
+                className="country-detail-flag"
+              />
+              <p className="gallery-counter">
+                {currentImage + 1} / {product.images.length}
+              </p>
+            </div>
+            <button className="gallery-btn" onClick={handleNext}>&#8594;</button>
           </div>
 
           <h1 className="product-detail-title">{product.title}</h1>
@@ -71,7 +96,7 @@ const ProductDetail = () => {
           </p>
 
           <p className="product-detail-info">
-            <strong>Valoración:</strong> {"".repeat(Math.round(product.rating))} ({product.rating})
+            <strong>Valoración:</strong> ({product.rating})
           </p>
 
           <p className="product-detail-info">
