@@ -1,66 +1,62 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import { Product } from "./types";
+import { getAllProducts } from "./api/product";
+import SearchBar from "./components/SearchBar";
+import ProductCard from "./components/productCard";
+import "./page.css";
+
+const Home = () => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+
+    getAllProducts()
+      .then((res) => {
+        setProducts(res.data.products);
+      })
+      .catch((e) => {
+        setError(`Error cargando los datos: ${e.message}`);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const filteredProducts = products.filter((p) =>
+    p.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="product-container">
+      <div className="search-section">
+        <h1>Catálogo de Productos</h1>
+
+        <SearchBar setSearchQuery={setSearchQuery} searchQuery={searchQuery} />
+
+        <p className="results-count">
+          {searchQuery
+            ? `${filteredProducts.length} resultado(s) para "${searchQuery}"`
+            : `${products.length} productos en total`}
+        </p>
+      </div>
+
+      {loading && <h1>Loading...</h1>}
+      {error && <h2>{error}</h2>}
+
+      <div className="results-container">
+        {filteredProducts.slice(0, 20).map((p) => (
+          <ProductCard product={p} key={p.id} />
+        ))}
+      </div>
     </div>
   );
-}
+};
+
+export default Home;
