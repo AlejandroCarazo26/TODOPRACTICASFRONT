@@ -16,4 +16,4 @@ export const SectionContainer = ({ children, className = "" }: SectionContainerP
   );
 };
 
-export default SectionContainer;
+export default SectionContainer;  

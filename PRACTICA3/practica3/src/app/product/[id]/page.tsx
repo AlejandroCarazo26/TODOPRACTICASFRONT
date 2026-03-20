@@ -53,7 +53,7 @@ const ProductDetail = () => {
       {product && (
         <SectionContainer className="product-detail-card">
 
-          {/* Galería con navegación — mismo sitio que antes tenía la imagen única */}
+
           <div className="product-gallery">
             <button className="gallery-btn" onClick={handlePrev}>&#8592;</button>
             <div className="gallery-img-wrapper">
