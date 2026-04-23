@@ -1,0 +1,30 @@
+
+
+
+
+.card {
+  background: #fff;
+  border: 1px solid #e1e8ed;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #536471;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.pageButton {
+  background: #fff;
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
