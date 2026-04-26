@@ -1,0 +1,28 @@
+.card {
+  background: #fff;
+  border: 1px solid #e1e8ed;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #536471;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.commentButton {
+  background: #1d9bf0;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 8px 20px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}

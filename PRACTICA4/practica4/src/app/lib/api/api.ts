@@ -12,21 +12,42 @@ function buildHeaders(auth: boolean = true): HeadersInit {
     "Content-Type": "application/json",
     "x-nombre": X_NOMBRE,
   };
+
   if (auth) {
     const token = getToken();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
   }
+
   return headers;
 }
 
-// AUTH
+async function handleResponse(res: Response) {
+  const text = await res.text();
+
+  try {
+    const data = JSON.parse(text);
+
+    if (!res.ok) {
+      throw new Error(data.error || "Error en la API");
+    }
+
+    return data;
+  } catch (error) {
+    console.error(text);
+    throw new Error("La API no devolvió JSON válido");
+  }
+}
+
 export async function login(email: string, password: string) {
   const res = await fetch(`${BASE_URL}/auth/login`, {
     method: "POST",
     headers: buildHeaders(false),
     body: JSON.stringify({ email, password }),
   });
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function register(username: string, email: string, password: string) {
@@ -35,39 +56,44 @@ export async function register(username: string, email: string, password: string
     headers: buildHeaders(false),
     body: JSON.stringify({ username, email, password }),
   });
-  return res.json();
+
+  return handleResponse(res);
 }
 
-// POSTS
 export async function getPosts(page: number = 1) {
-  const res = await fetch(`${BASE_URL}/posts?page=${page}`, {
+  const res = await fetch(`${BASE_URL}/home?page=${page}`, {
     headers: buildHeaders(),
   });
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function getPost(id: string) {
   const res = await fetch(`${BASE_URL}/posts/${id}`, {
     headers: buildHeaders(),
   });
-  return res.json();
+
+  return handleResponse(res);
 }
 
-export async function createPost(content: string) {
+export async function createPost(contenido: string) {
   const res = await fetch(`${BASE_URL}/posts`, {
     method: "POST",
     headers: buildHeaders(),
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({ contenido }),
   });
   return res.json();
 }
+
+
 
 export async function likePost(id: string) {
   const res = await fetch(`${BASE_URL}/posts/${id}/like`, {
     method: "POST",
     headers: buildHeaders(),
   });
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function retweetPost(id: string) {
@@ -75,53 +101,56 @@ export async function retweetPost(id: string) {
     method: "POST",
     headers: buildHeaders(),
   });
-  return res.json();
+
+  return handleResponse(res);
 }
 
-// COMMENTS
 export async function getComments(postId: string) {
   const res = await fetch(`${BASE_URL}/posts/${postId}/comments`, {
     headers: buildHeaders(),
   });
-  return res.json();
+
+  return handleResponse(res);
 }
 
-export async function createComment(postId: string, content: string) {
-  const res = await fetch(`${BASE_URL}/posts/${postId}/comments`, {
+export async function createComment(postId: string, contenido: string) {
+  const res = await fetch(`${BASE_URL}/posts/${postId}/comment`, {
     method: "POST",
     headers: buildHeaders(),
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({ contenido }),
   });
-  return res.json();
+  return handleResponse(res);
 }
 
-// PROFILE
+
 export async function getProfile(username: string) {
-  const res = await fetch(`${BASE_URL}/users/${username}`, {
+  const res = await fetch(`${BASE_URL}/users/${username}/profile`, {
     headers: buildHeaders(),
   });
-  return res.json();
+
+  return handleResponse(res);
 }
 
 export async function getUserPosts(username: string, page: number = 1) {
   const res = await fetch(`${BASE_URL}/users/${username}/posts?page=${page}`, {
     headers: buildHeaders(),
   });
-  return res.json();
+
+  return handleResponse(res);
 }
 
-export async function followUser(username: string) {
-  const res = await fetch(`${BASE_URL}/users/${username}/follow`, {
+export async function followUser(userId: string) {
+  const res = await fetch(`${BASE_URL}/users/${userId}/follow`, {
     method: "POST",
     headers: buildHeaders(),
   });
-  return res.json();
+  return handleResponse(res);
 }
 
-export async function unfollowUser(username: string) {
-  const res = await fetch(`${BASE_URL}/users/${username}/follow`, {
-    method: "DELETE",
+
+export async function getMe() {
+  const res = await fetch(`${BASE_URL}/users/me`, {
     headers: buildHeaders(),
   });
-  return res.json();
+  return handleResponse(res);
 }

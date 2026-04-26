@@ -1,0 +1,43 @@
+header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e1e8ed;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1d9bf0;
+  text-decoration: none;
+}
+
+.header-profile {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d9bf0;
+  text-decoration: none;
+}
+
+.header-back {
+  background: #1d9bf0;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  position: fixed;
+  right: 100px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}

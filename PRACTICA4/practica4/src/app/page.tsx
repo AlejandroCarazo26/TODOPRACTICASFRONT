@@ -2,20 +2,21 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import styles from "./page.module.css";
+import "./page.css";
 import { createPost, getPosts, likePost, retweetPost } from "./lib/api/api";
 
 interface Author {
+  _id: string;
   username: string;
 }
 
 interface Post {
-  id: string;
-  content: string;
-  author: Author;
+  _id: string;
+  contenido: string;
+  autor: Author;
   createdAt: string;
-  likes: number;
-  retweets: number;
+  likes: unknown[];
+  retweets: unknown[];
 }
 
 export default function HomePage() {
@@ -31,11 +32,17 @@ export default function HomePage() {
   }, [page]);
 
   async function fetchPosts(p: number) {
-    setLoading(true);
-    const data = await getPosts(p);
-    setPosts(data.posts || data.data || []);
-    setTotalPages(data.totalPages || data.pages || 1);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const data = await getPosts(p);
+      setPosts(data.posts || []);
+      setTotalPages(data.totalPaginas || 1);
+    } catch (error) {
+      console.error("Error cargando posts:", error);
+      setPosts([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleCreatePost(e: React.FormEvent) {
@@ -61,12 +68,13 @@ export default function HomePage() {
 
   return (
     <div>
-      <div className={styles.card}>
+      
+      <div className="card">
         <form onSubmit={handleCreatePost}>
           <textarea
             value={newPost}
             onChange={(e) => setNewPost(e.target.value)}
-            placeholder="¿Qué está pasando?"
+            placeholder="¿Qué está pasando? máx.280"
             maxLength={280}
             style={{
               width: "100%",
@@ -82,7 +90,7 @@ export default function HomePage() {
             <button
               type="submit"
               disabled={posting || !newPost.trim()}
-              className={styles.tweetButton}
+              className="tweetButton"
             >
               {posting ? "Publicando..." : "Publicar"}
             </button>
@@ -94,27 +102,27 @@ export default function HomePage() {
         <p style={{ textAlign: "center", padding: 32, color: "#536471" }}>Cargando...</p>
       ) : (
         posts.map((post) => (
-          <div key={post.id} className={styles.card}>
+          <div key={post._id} className="card">
             <Link
-              href={`/profile/${post.author?.username}`}
+              href={`/profile/${post.autor?._id}`}
               style={{ fontWeight: 700, color: "#0f1419", textDecoration: "none" }}
             >
-              @{post.author?.username}
+              @{post.autor?.username}
             </Link>
             <p style={{ fontSize: 12, color: "#536471", marginBottom: 8 }}>
               {new Date(post.createdAt).toLocaleString("es-ES")}
             </p>
-
-            <Link href={`/post/${post.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-              <p style={{ fontSize: 15, marginBottom: 12, cursor: "pointer" }}>{post.content}</p>
+            <Link href={`/post/${post._id}`} style={{ textDecoration: "none", color: "inherit" }}>
+              <p style={{ fontSize: 15, marginBottom: 12, cursor: "pointer" }}>
+                {post.contenido}
+              </p>
             </Link>
-
             <div style={{ display: "flex", gap: 16 }}>
-              <button onClick={() => handleLike(post.id)} className={styles.actionButton}>
-                ❤️ {post.likes}
+              <button onClick={() => handleLike(post._id)} className="actionButton">
+                ❤️ {post.likes.length}
               </button>
-              <button onClick={() => handleRetweet(post.id)} className={styles.actionButton}>
-                🔁 {post.retweets}
+              <button onClick={() => handleRetweet(post._id)} className="actionButton">
+                🔁 {post.retweets.length}
               </button>
             </div>
           </div>
@@ -126,7 +134,7 @@ export default function HomePage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className={styles.pageButton}
+            className="pageButton"
           >
             Anterior
           </button>
@@ -136,7 +144,7 @@ export default function HomePage() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className={styles.pageButton}
+            className="pageButton"
           >
             Siguiente
           </button>

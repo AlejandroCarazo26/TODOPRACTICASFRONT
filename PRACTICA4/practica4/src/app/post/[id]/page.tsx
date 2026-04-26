@@ -4,25 +4,27 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createComment, getComments, getPost, likePost, retweetPost } from "@/app/lib/api/api";
+import "./page.css";
 
 interface Author {
+  _id: string;
   username: string;
 }
 
 interface Post {
-  id: string;
-  content: string;
-  author: Author;
+  _id: string;
+  contenido: string;
+  autor: Author;
   createdAt: string;
-  likes: number;
-  retweets: number;
+  likes: unknown[];
+  retweets: unknown[];
 }
 
 interface Comment {
-  id: string;
-  content: string;
-  author: Author;
-  createdAt: string;
+  _id: string;
+  contenido: string;
+  autor: Author;
+  fecha: string;
 }
 
 export default function PostPage() {
@@ -38,25 +40,23 @@ export default function PostPage() {
   }, [id]);
 
   async function fetchAll() {
-    setLoading(true);
-    const [postData, commentsData] = await Promise.all([
-      getPost(id),
-      getComments(id),
-    ]);
-    setPost(postData.post || postData);
-    setComments(commentsData.comments || commentsData.data || []);
-    setLoading(false);
-  }
+  setLoading(true);
+  const postData = await getPost(id);
+  const post = postData.post || postData;
+  setPost(post);
+  setComments(post.comentarios || []);
+  setLoading(false);
+}
 
   async function handleLike() {
     if (!post) return;
-    await likePost(post.id);
+    await likePost(post._id);
     fetchAll();
   }
 
   async function handleRetweet() {
     if (!post) return;
-    await retweetPost(post.id);
+    await retweetPost(post._id);
     fetchAll();
   }
 
@@ -80,30 +80,28 @@ export default function PostPage() {
 
   return (
     <div>
-      {/* Post principal */}
-      <div style={cardStyle}>
+      <div className="card">
         <Link
-          href={`/profile/${post.author?.username}`}
+          href={`/profile/${post.autor?._id}`}
           style={{ fontWeight: 700, color: "#0f1419", textDecoration: "none" }}
         >
-          @{post.author?.username}
+          @{post.autor?.username}
         </Link>
         <p style={{ fontSize: 12, color: "#536471", marginBottom: 12 }}>
           {new Date(post.createdAt).toLocaleString("es-ES")}
         </p>
-        <p style={{ fontSize: 18, marginBottom: 16 }}>{post.content}</p>
+        <p style={{ fontSize: 18, marginBottom: 16 }}>{post.contenido}</p>
         <div style={{ display: "flex", gap: 16 }}>
-          <button onClick={handleLike} style={actionButtonStyle}>
-            ❤️ {post.likes}
+          <button onClick={handleLike} className="actionButton">
+            ❤️ {post.likes.length}
           </button>
-          <button onClick={handleRetweet} style={actionButtonStyle}>
-            🔁 {post.retweets}
+          <button onClick={handleRetweet} className="actionButton">
+            🔁 {post.retweets.length}
           </button>
         </div>
       </div>
 
-      {/* Formulario comentario */}
-      <div style={cardStyle}>
+      <div className="card">
         <form onSubmit={handleComment}>
           <textarea
             value={newComment}
@@ -124,7 +122,7 @@ export default function PostPage() {
             <button
               type="submit"
               disabled={sending || !newComment.trim()}
-              style={tweetButtonStyle}
+              className="commentButton"
             >
               {sending ? "Enviando..." : "Comentar"}
             </button>
@@ -132,56 +130,26 @@ export default function PostPage() {
         </form>
       </div>
 
-      {/* Lista de comentarios */}
       {comments.length === 0 ? (
         <p style={{ textAlign: "center", color: "#536471", padding: 16 }}>
           Sin comentarios aún
         </p>
       ) : (
         comments.map((comment) => (
-          <div key={comment.id} style={cardStyle}>
+          <div key={comment._id} className="card">
             <Link
-              href={`/profile/${comment.author?.username}`}
+              href={`/profile/${comment.autor?._id}`}
               style={{ fontWeight: 700, color: "#0f1419", textDecoration: "none" }}
             >
-              @{comment.author?.username}
+              @{comment.autor?.username}
             </Link>
             <p style={{ fontSize: 12, color: "#536471", marginBottom: 8 }}>
-              {new Date(comment.createdAt).toLocaleString("es-ES")}
+              {new Date(comment.fecha).toLocaleString("es-ES")}
             </p>
-            <p style={{ fontSize: 15 }}>{comment.content}</p>
+            <p style={{ fontSize: 15 }}>{comment.contenido}</p>
           </div>
         ))
       )}
     </div>
   );
 }
-
-const cardStyle: React.CSSProperties = {
-  background: "#fff",
-  border: "1px solid #e1e8ed",
-  borderRadius: 12,
-  padding: 16,
-  marginBottom: 12,
-};
-
-const tweetButtonStyle: React.CSSProperties = {
-  background: "#1d9bf0",
-  color: "#fff",
-  border: "none",
-  borderRadius: 24,
-  padding: "8px 20px",
-  fontWeight: 700,
-  fontSize: 15,
-  cursor: "pointer",
-};
-
-const actionButtonStyle: React.CSSProperties = {
-  background: "none",
-  border: "none",
-  cursor: "pointer",
-  fontSize: 14,
-  color: "#536471",
-  padding: "4px 8px",
-  borderRadius: 8,
-};
