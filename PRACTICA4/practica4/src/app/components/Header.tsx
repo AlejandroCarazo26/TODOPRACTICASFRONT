@@ -16,12 +16,20 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const isLogin = pathname === "/login";
 
   useEffect(() => {
+    const token = document.cookie.match(/token=([^;]*)/);
+    if (!token) return;
     getMe().then((data) => {
       setMe(data.user || data);
     }).catch(() => {});
   }, []);
+
+  function handleLogout() {
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    window.location.href = "/login";
+  }
 
   return (
     <header>
@@ -29,18 +37,26 @@ export default function Header() {
         <Link href="/" className="header-logo">
           TwitterClone
         </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          {!isHome && (
-            <button onClick={() => router.back()} className="header-back">
-              Volver
+        {!isLogin && (
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button onClick={() => { window.location.href = "/"; }} className="header-home">
+              Home
             </button>
-          )}
-          {me && (
-            <Link href={`/profile/${me._id}`} className="header-profile">
-              @{me.username}
-            </Link>
-          )}
-        </div>
+            {!isHome && (
+              <button onClick={() => router.back()} className="header-back">
+                Volver
+              </button>
+            )}
+            {me && (
+              <Link href={`/profile/${me._id}`} className="header-profile">
+                @{me.username}
+              </Link>
+            )}
+            <button onClick={handleLogout} className="header-logout">
+              Cerrar sesión
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );

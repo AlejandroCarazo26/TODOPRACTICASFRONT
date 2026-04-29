@@ -26,7 +26,7 @@ export default function LoginPage() {
       const data = await login(loginData.email, loginData.password);
       if (data.token) {
         document.cookie = `token=${data.token}; path=/`;
-        router.push("/");
+        window.location.href = "/";
       } else {
         setError(data.message || "Credenciales incorrectas");
       }
@@ -48,7 +48,7 @@ export default function LoginPage() {
       );
       if (data.token) {
         document.cookie = `token=${data.token}; path=/`;
-        router.push("/");
+        window.location.href = "/";
       } else {
         setError(data.message || "Error al registrarse");
       }

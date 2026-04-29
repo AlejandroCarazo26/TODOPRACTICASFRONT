@@ -41,3 +41,25 @@ header {
   font-weight: 600;
   cursor: pointer;
 }
+
+.header-home {
+  background: #0f1419;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.header-logout {
+  background: #f4212e;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}

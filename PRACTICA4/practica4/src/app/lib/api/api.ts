@@ -25,19 +25,19 @@ function buildHeaders(auth: boolean = true): HeadersInit {
 
 async function handleResponse(res: Response) {
   const text = await res.text();
-
+  let data;
   try {
-    const data = JSON.parse(text);
-
-    if (!res.ok) {
-      throw new Error(data.error || "Error en la API");
-    }
-
-    return data;
-  } catch (error) {
+    data = JSON.parse(text);
+  } catch {
     console.error(text);
     throw new Error("La API no devolvió JSON válido");
   }
+
+  if (!res.ok) {
+    throw new Error(data.error || "Error en la API");
+  }
+
+  return data;
 }
 
 export async function login(email: string, password: string) {
